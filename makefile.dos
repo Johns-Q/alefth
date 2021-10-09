@@ -1,0 +1,64 @@
+#
+#	ALE Forth Version 2.04
+#
+#		Copyright (c) 1991,1992 by Lutz Sammer.
+#
+#		Bug-reports via usenet: johns
+#
+#	File:	makefile (makefile.dos)
+#
+#		Makefile for the ALE forth kernel under DOS with GNU djgpp.
+#
+################################################################################
+#
+#	make
+#		Update all files.
+#
+#	make fth.new
+#		Test a new version.
+#
+#	make fth.exe
+#		Build the exe-file.
+#
+
+all: fth
+	@echo done.
+
+fth: out.o
+	ld -e _main -o fth out.o
+
+fth.new: out.o
+	ld -e _main -o fth.new out.o
+
+out.o: out.s
+	as -o out.o out.s
+
+SOURCES= ftc.4th \
+	startup.4th variable.4th \
+	config.4th primitiv.4th stacks.4th math.4th execute.4th mem.4th \
+	msdos.4th float.4th \
+	dict.4th blkfile.4th compiler.4th control.4th error.4th \
+	in-out.4th internal.4th intrpret.4th numeric.4th search.4th \
+	strings.4th tools.4th coldbye.4th user.4th
+
+out.s:	$(SOURCES)
+	fth "-d 131072 -i ftc.4th"
+	dtou out.s
+
+Xout.s: out.zip
+	pkunzip out.zip
+
+fth.exe:	fth
+	strip fth
+	aout2exe fth
+
+clean:
+	del out.o
+	del out.s
+	del out.zip
+
+doit:
+	fth "-d 131072 -i ftc.4th"
+	dtou out.s
+	as -o out.o out.s
+	ld -e _main -o fth out.o
